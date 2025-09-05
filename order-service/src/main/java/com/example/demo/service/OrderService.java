@@ -18,11 +18,11 @@ import com.example.demo.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
 public class OrderService {
 	
   private final OrderRepository orderRepository;
   private final RestTemplate restTemplate;
+  
   
   public OrderService(OrderRepository orderRepository)
   {
@@ -54,9 +54,10 @@ public class OrderService {
 	  }
 	  
 	  Order order  = new Order();
-	  order.setOrderId(orderDto.getOrderId());
+	 // order.setOrderId(orderDto.getOrderId());
+	  order.setUserId(orderDto.getUserId());
 	  order.setAmount(orderDto.getAmount());
-	  order.setOrderStatus(orderDto.getOrderStatus());
+	  order.setOrderStatus("Order Created");
 	  
 	  Order saveOrder = orderRepository.save(order);  
 	  

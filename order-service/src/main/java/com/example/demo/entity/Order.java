@@ -10,7 +10,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "orders")
@@ -23,6 +22,10 @@ public class Order {
 	private Double amount;
 	private String orderStatus;
 	
+	public Order()
+	{
+		
+	}
 	public Long getOrderId() {
 		return orderId;
 	}

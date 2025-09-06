@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
@@ -30,6 +29,30 @@ public class UserService {
         return new UserDTO(saved.getId(), saved.getName(), saved.getEmail());
     }
 
+    public UserDTO updateUser(Long id, UserDTO userDTO)
+    {
+    	User user = userRepository.findById(id).orElseThrow(()-> new RuntimeException("User Not Found"));
+    	
+    	user.setEmail(userDTO.getEmail());
+    	user.setName(userDTO.getName());
+    	
+    	User updatedUser = userRepository.save(user);
+
+    	
+    	return new UserDTO(updatedUser.getId(),updatedUser.getName(),updatedUser.getEmail());
+    }
+    
+    public void deleteUserById(Long id) {
+    	
+    	if(!userRepository.existsById(id))
+    	{
+    		throw new RuntimeException("User Not Found");
+    	}
+    	
+    	userRepository.deleteById(id);
+    }
+    
+    
     public UserDTO getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));

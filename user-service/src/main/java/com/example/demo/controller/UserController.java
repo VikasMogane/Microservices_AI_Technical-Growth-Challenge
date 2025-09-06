@@ -11,7 +11,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users")
-@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
@@ -26,11 +25,26 @@ public class UserController {
         return ResponseEntity.ok(userService.createUser(userDTO));
     }
 
+    @PutMapping("{id}")
+    public  ResponseEntity<UserDTO> updateUser(@PathVariable("id") Long id ,@RequestBody UserDTO  userDTO)
+    {
+    	
+    	return ResponseEntity.ok(userService.updateUser(id, userDTO));
+    }
+    
+    @DeleteMapping("{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable("id") Long id)
+    {
+    	userService.deleteUserById(id);
+    	
+    	return ResponseEntity.ok("User Deleted Successfully");
+    }
+    
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
-
+    
     @GetMapping
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());

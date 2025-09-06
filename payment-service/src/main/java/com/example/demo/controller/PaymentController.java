@@ -3,8 +3,11 @@ package com.example.demo.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,7 +41,7 @@ public class PaymentController {
 	} */
 	
 
-  @PostMapping
+    @PostMapping
     public ResponseEntity<PaymentDTO> makePayment(@RequestBody PaymentDTO paymentDTO) {
         return ResponseEntity.ok(paymentService.makePayment(paymentDTO));
     }
@@ -48,5 +51,17 @@ public class PaymentController {
         return ResponseEntity.ok(paymentService.getAllPayments());
     }
 	
+   
+    @PutMapping("{id}")
+    public ResponseEntity<PaymentDTO> updatePayment(@PathVariable("id") Long id,@RequestBody PaymentDTO paymentDTO)
+    {
+    	return ResponseEntity.ok(paymentService.updatePayment(id,paymentDTO));
+    }
+    
+    @DeleteMapping("{id}")
+    public ResponseEntity<String> deletePayment(@PathVariable("id") Long id)
+    {
+    	return ResponseEntity.ok(paymentService.deletePayment(id));
+    }
 
 }

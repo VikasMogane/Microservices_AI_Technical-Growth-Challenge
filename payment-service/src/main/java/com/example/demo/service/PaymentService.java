@@ -67,25 +67,26 @@ public class PaymentService {
              ))
              .collect(Collectors.toList());
  }
-public PaymentDTO updatePayment(Long id, PaymentDTO paymentDTO) {
-	
-	Payment payment = paymentRepository.findById(id).orElseThrow(()-> new RuntimeException("Payment Not Found For This Id"));
-	
-	payment.setAmount(paymentDTO.getAmount());
-	payment.setTransactionId(UUID.randomUUID().toString());
-	
-	Payment savedPayment = paymentRepository.save(payment);
-	
-	return new PaymentDTO(savedPayment.getOrderId(), savedPayment.getPaymentId(), savedPayment.getAmount(), savedPayment.getPaymentStatus(), savedPayment.getTransactionId());
-}
-public String deletePayment(Long id) {
-	
-	paymentRepository.findById(id).orElseThrow(()-> new RuntimeException("Payment Not Found For This Id"));
-	
-	paymentRepository.deleteById(id);
-	
-	return  "Payment Deleted Successfully";
-}
+	public PaymentDTO updatePayment(Long id, PaymentDTO paymentDTO) {
+		
+		Payment payment = paymentRepository.findById(id).orElseThrow(()-> new RuntimeException("Payment Not Found For This Id"));
+		
+		payment.setAmount(paymentDTO.getAmount());
+		payment.setTransactionId(UUID.randomUUID().toString());
+		
+		Payment savedPayment = paymentRepository.save(payment);
+		
+		return new PaymentDTO(savedPayment.getOrderId(), savedPayment.getPaymentId(), savedPayment.getAmount(), savedPayment.getPaymentStatus(), savedPayment.getTransactionId());
+	}
+	public String deletePayment(Long id)
+	{
+			
+		paymentRepository.findById(id).orElseThrow(()-> new RuntimeException("Payment Not Found For This Id"));
+		
+		paymentRepository.deleteById(id);
+		
+		return  "Payment Deleted Successfully";
+    }
  
  /* public Payment doPayment(Payment payment)
  {

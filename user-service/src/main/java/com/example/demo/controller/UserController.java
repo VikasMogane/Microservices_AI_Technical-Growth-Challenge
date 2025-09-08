@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import com.example.demo.dto.UserDTO;
 import com.example.demo.service.UserService;
 
+import jakarta.validation.Valid;
+
 import java.util.List;
 
 @RestController
@@ -21,7 +23,7 @@ public class UserController {
 	}
 
     @PostMapping
-    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<UserDTO> createUser(@Valid  @RequestBody UserDTO userDTO) {
         return ResponseEntity.ok(userService.createUser(userDTO));
     }
 

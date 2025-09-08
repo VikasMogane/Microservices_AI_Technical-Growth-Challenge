@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.dto.UserDTO;
 import com.example.demo.entity.User;
+import com.example.demo.exception.UserNotFoundException;
 import com.example.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,7 @@ public class UserService {
 
     public UserDTO updateUser(Long id, UserDTO userDTO)
     {
-    	User user = userRepository.findById(id).orElseThrow(()-> new RuntimeException("User Not Found"));
+    	User user = userRepository.findById(id).orElseThrow(()-> new UserNotFoundException("User Not Found"+id));
     	
     	user.setEmail(userDTO.getEmail());
     	user.setName(userDTO.getName());

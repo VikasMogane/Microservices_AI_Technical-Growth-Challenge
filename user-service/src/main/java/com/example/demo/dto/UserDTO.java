@@ -1,11 +1,20 @@
 package com.example.demo.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 //@Getter @Setter @NoArgsConstructor  @Builder
 public class UserDTO {
+	
     private Long id;
+    
+    @NotNull(message = "name cannot be blank")
+    @Size(min = 2 , message = "name cannot be less than 2 characters")
     private String name;
+    
+    @Email(message = "Email must be valid")
     private String email;
     
     
@@ -18,6 +27,7 @@ public class UserDTO {
 		this.name = name;
 		this.email = email;
 	}
+	
 	public Long getId() {
 		return id;
 	}

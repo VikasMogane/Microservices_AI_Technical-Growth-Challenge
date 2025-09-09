@@ -5,7 +5,6 @@ import lombok.*;
 
 @Entity
 @Table(name = "users")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,7 +12,23 @@ public class User {
 
     private String name;
     private String email;
+    public User()
+    {
+    	
+    }
+    public User(Long id,String name, String email) {
+		super();
+		this.id= id;
+		this.name = name;
+		this.email = email;
+	}
     
+	public User(String name, String email) {
+		super();
+		this.name = name;
+		this.email = email;
+	}
+	
 	public Long getId() {
 		return id;
 	}

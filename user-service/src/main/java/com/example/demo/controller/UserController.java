@@ -1,6 +1,8 @@
 package com.example.demo.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory; 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,7 +16,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 public class UserController {
-
+	
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
     
 	public UserController(UserService userService)
@@ -44,11 +47,13 @@ public class UserController {
     
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable("id") Long id) {
+    	
         return ResponseEntity.ok(userService.getUserById(id));
     }
     
     @GetMapping
     public ResponseEntity<List<UserDTO>> getAllUsers() {
+    	log.info("Inside Get Method of User Controller");
         return ResponseEntity.ok(userService.getAllUsers());
     }
 }

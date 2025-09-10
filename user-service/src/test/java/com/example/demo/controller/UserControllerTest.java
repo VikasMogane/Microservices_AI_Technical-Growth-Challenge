@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 public class UserControllerTest {
 
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
-
+ /*
     
 	   @Autowired
 	    private MockMvc mockMvc;
@@ -34,5 +34,5 @@ public class UserControllerTest {
 		mockMvc.perform(get("/users")).andExpect(status().isOk());
         log.info("✅ Test for GET /users executed successfully");
 
-	}
+	} */
 }

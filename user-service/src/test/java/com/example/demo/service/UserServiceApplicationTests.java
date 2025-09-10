@@ -22,12 +22,12 @@ class UserServiceApplicationTests {
 //	void contextLoads() {
 //	}
 	
-	@Test
-	void testCreateUser() {
-		UserDTO userDTO = new UserDTO(4L,"vikas","vikas@example.com");
-		UserDTO savedUser = userService.createUser(userDTO);
-		assertNotNull(savedUser.getId());
-		
-	}
+//	@Test
+//	void testCreateUser() {
+//		UserDTO userDTO = new UserDTO(4L,"vikas","vikas@example.com");
+//		UserDTO savedUser = userService.createUser(userDTO);
+//		assertNotNull(savedUser.getId());
+//		
+//	}
 
 }

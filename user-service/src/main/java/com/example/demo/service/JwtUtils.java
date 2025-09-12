@@ -13,7 +13,7 @@ import javax.crypto.SecretKey;
 @Component
 public class JwtUtils {
     private final String secret = "MySuperSecretKeyThatIsAtLeast32Chars1234"; // move to application.properties later
-    private final long expirationMs = 3600000; // 1 hour
+    private final long expirationMs = 1000 * 60 * 60; // 1 hour
 
     private SecretKey getSigningKey() {
         // Convert secret to a secure key

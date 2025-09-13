@@ -3,49 +3,63 @@ package com.example.demo.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.function.Function;
 
 @Component("gatewayJwtUtils")
 public class JwtUtils {
 
-    private static final String SECRET_KEY = "YOUR_SECRET_KEY_32_CHARS_MINIMUM_!!!";
+    // Generate a secure 256-bit key for HS256
+    private final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
-    private Key getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
-        return Keys.hmacShaKeyFor(keyBytes);
+    private final long expirationMs = 1000 * 60 * 60; // 1 hour
+
+    // Extract username from token
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
     }
 
+    // Extract any claim
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    // Extract all claims
+    private Claims extractAllClaims(String token) {
+        return Jwts.parserBuilder()
+                   .setSigningKey(SECRET_KEY)
+                   .build()
+                   .parseClaimsJws(token)
+                   .getBody();
+    }
+
+    // Check if token is valid
+    public boolean validateToken(String token) {
+        try {
+            extractAllClaims(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // Generate token
     public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hours
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .signWith(SECRET_KEY)
                 .compact();
     }
 
-    public String extractUsername(String token) {
-        return extractAllClaims(token).getSubject();
-    }
-
-    public boolean validateToken(String token, String username) {
-        return extractUsername(token).equals(username) && !isTokenExpired(token);
-    }
-
-    private boolean isTokenExpired(String token) {
-        return extractAllClaims(token).getExpiration().before(new Date());
-    }
-
-    private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+    // Optional: expose encoded key for storage
+    public String getSecretKeyBase64() {
+        return java.util.Base64.getEncoder().encodeToString(SECRET_KEY.getEncoded());
     }
 }

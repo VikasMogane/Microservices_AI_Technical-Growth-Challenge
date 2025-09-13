@@ -20,8 +20,7 @@ public class AuthController {
 	
 	@Autowired
 	private JwtUtils jwtUtils;
-	
-	
+
 	
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest )

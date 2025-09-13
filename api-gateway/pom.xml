@@ -17,26 +17,25 @@
         <spring-cloud.version>2025.0.0</spring-cloud.version>
     </properties>
 
-    <dependencies>
-    <!-- Servlet Web -->
+
+
+
+   <dependencies>
+    <!-- Spring Cloud Gateway (WebFlux) -->
     <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-web</artifactId>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-gateway</artifactId>
     </dependency>
 
-  <dependency>
+    <!-- Spring Security (Reactive) -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+    
+    <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-webflux</artifactId>
-</dependency>
-
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-security</artifactId>
-</dependency>
-
-<dependency>
-    <groupId>org.springframework.cloud</groupId>
-    <artifactId>spring-cloud-starter-gateway</artifactId>
 </dependency>
 
     <!-- JWT -->
@@ -57,26 +56,8 @@
         <version>0.11.5</version>
         <scope>runtime</scope>
     </dependency>
-
-<dependency>
-    <groupId>org.projectlombok</groupId>
-    <artifactId>lombok</artifactId>
-    <version>1.18.30</version>
-    <scope>provided</scope>
-</dependency>
-
-
-    <!-- JPA + H2 -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-data-jpa</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>com.h2database</groupId>
-        <artifactId>h2</artifactId>
-        <scope>runtime</scope>
-    </dependency>
 </dependencies>
+
 
 
     <dependencyManagement>

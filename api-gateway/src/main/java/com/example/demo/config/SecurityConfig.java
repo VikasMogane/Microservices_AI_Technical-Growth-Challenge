@@ -2,75 +2,43 @@ package com.example.demo.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.authentication.ReactiveAuthenticationManager;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
+import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
+import org.springframework.security.web.server.context.ServerSecurityContextRepository;
+import reactor.core.publisher.Mono;
 
 @Configuration
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthFilter;
+    private final JwtReactiveAuthenticationManager authManager;
+    private final JwtServerSecurityContextRepository securityContextRepository;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter) {
-        this.jwtAuthFilter = jwtAuthFilter;
+    public SecurityConfig(JwtReactiveAuthenticationManager authManager,
+                          JwtServerSecurityContextRepository securityContextRepository) {
+        this.authManager = authManager;
+        this.securityContextRepository = securityContextRepository;
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**").permitAll()
-                .requestMatchers("/h2-console/**").permitAll() 
-                .requestMatchers("/users/**").authenticated()
-                .anyRequest().authenticated()
+    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+
+        AuthenticationWebFilter jwtAuthWebFilter = new AuthenticationWebFilter(authManager);
+        jwtAuthWebFilter.setServerAuthenticationConverter(new JwtServerAuthenticationConverter());
+        jwtAuthWebFilter.setSecurityContextRepository(securityContextRepository);
+
+        http.csrf(csrf -> csrf.disable())
+            .authorizeExchange(exchanges -> exchanges
+                .pathMatchers("/auth/**", "/h2-console/**").permitAll()
+                .anyExchange().authenticated()
             )
-            .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin())) // allowing frames for H2 database checking
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
-        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
-        //  Add JWT filter before UsernamePasswordAuthenticationFilter
-        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterAt(jwtAuthWebFilter, SecurityWebFiltersOrder.AUTHENTICATION)
+            .headers(headers -> headers.frameOptions(frame -> frame.disable()))
+            .httpBasic(httpBasic -> httpBasic.disable())
+            .formLogin(form -> form.disable());
 
         return http.build();
     }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//@Configuration
-//public class SecurityConfig 	 {
-//	
-//	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception
-//	{
-//		http.csrf(csrf -> csrf.disable()).authorizeHttpRequests(auth -> auth.requestMatchers("/auth/**").permitAll()
-//				.anyRequest().authenticated());
-//		return http.build();
-//		
-//	}
-//
-//}
-
-

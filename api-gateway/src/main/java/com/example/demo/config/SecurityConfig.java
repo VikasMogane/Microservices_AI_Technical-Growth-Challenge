@@ -20,12 +20,13 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
-            .csrf(csrf -> csrf.disable())
+            .csrf(csrf -> csrf.disable()) // disable CSRF
+            .headers(headers -> headers.frameOptions().disable()) // allow H2 frames
             .authorizeExchange(exchange -> exchange
                 .pathMatchers("/auth/**").permitAll()
+                .pathMatchers("/h2-console/**").permitAll()
                 .anyExchange().authenticated()
             )
-            // register our JWT filter at the right point
             .addFilterAt(jwtAuthenticationFilter, SecurityWebFiltersOrder.AUTHENTICATION)
             .build();
     }

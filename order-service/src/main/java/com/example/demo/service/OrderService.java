@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import javax.management.RuntimeErrorException;
@@ -15,6 +16,9 @@ import com.example.demo.dto.UserDto;
 import com.example.demo.entity.Order;
 import com.example.demo.repository.OrderRepository;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
+import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -41,8 +45,12 @@ public class OrderService {
 		  return orderRepository.findAll();
 	  }
 	  
-	  public OrderDto createOrder1(OrderDto orderDto)
-	  {
+	  
+	  @CircuitBreaker(name = "userservice", fallbackMethod = "userServiceFallback")
+	  @Retry(name = "userservice", fallbackMethod = "userServiceFallback")
+	  //@TimeLimiter(name = "userservice")
+	  public CompletableFuture<OrderDto> createOrder1(OrderDto orderDto) {
+			    return CompletableFuture.supplyAsync(() -> {
 	      // ✅ Call User-Service to check if user exists
 	
 		  String userServiceUrl = "http://localhost:8080/users/"+orderDto.getUserId();
@@ -62,6 +70,15 @@ public class OrderService {
 		  Order saveOrder = orderRepository.save(order);  
 		  
 		  return new OrderDto(saveOrder.getOrderId(), saveOrder.getUserId(), saveOrder.getAmount(), saveOrder.getOrderStatus());
+			    });
+		  }
+	  
+	  
+	  public CompletableFuture<OrderDto> userServiceFallback(OrderDto orderDto,  Throwable t)
+	  {
+		  OrderDto fallbackOrder = new OrderDto(null, orderDto.getUserId(), orderDto.getAmount(), "⚠️ User-service Unavailable, order kept in pending state");
+		  
+		  return CompletableFuture.completedFuture(fallbackOrder);
 	  }
 	  
 	  public List<OrderDto> getAllOrders1()

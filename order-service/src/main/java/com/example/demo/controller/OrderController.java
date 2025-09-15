@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,12 +27,17 @@ public class OrderController {
 	 this.orderService = orderService;
  }
 
- 
  @PostMapping
- public ResponseEntity<OrderDto>  saveOrder(@RequestBody  OrderDto order)
- {
-	 return ResponseEntity.ok( orderService.createOrder1(order));
+ public CompletableFuture<ResponseEntity<OrderDto>> saveOrder(@RequestBody OrderDto order) {
+     return orderService.createOrder1(order)
+                        .thenApply(ResponseEntity::ok);
  }
+ 
+// @PostMapping
+// public CompletableFuture<OrderDto>  saveOrder(@RequestBody  OrderDto order)
+// {
+//	 return CompletableFuture.supplyAsync(() -> { ResponseEntity.ok( orderService.createOrder1(order)); });
+// }
  
  @GetMapping
  public ResponseEntity<List<OrderDto>> listOfOrders()

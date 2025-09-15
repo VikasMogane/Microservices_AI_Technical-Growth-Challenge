@@ -48,10 +48,11 @@ public class OrderService {
 	  
 	  @CircuitBreaker(name = "userservice", fallbackMethod = "userServiceFallback")
 	  @Retry(name = "userservice", fallbackMethod = "userServiceFallback")
-	  //@TimeLimiter(name = "userservice")
+	  //@TimeLimiter(name = "userservice") 
 	  public CompletableFuture<OrderDto> createOrder1(OrderDto orderDto) {
+		  // Used CompletableFuture (Async) so order creation doesn’t block the system → faster & smoother.
 			    return CompletableFuture.supplyAsync(() -> {
-	      // ✅ Call User-Service to check if user exists
+	      // Call User-Service to check if user exists
 	
 		  String userServiceUrl = "http://localhost:8080/users/"+orderDto.getUserId();
 		  UserDto user          = restTemplate.getForObject(userServiceUrl, UserDto.class);
@@ -76,7 +77,8 @@ public class OrderService {
 	  
 	  public CompletableFuture<OrderDto> userServiceFallback(OrderDto orderDto,  Throwable t)
 	  {
-		  OrderDto fallbackOrder = new OrderDto(null, orderDto.getUserId(), orderDto.getAmount(), "⚠️ User-service Unavailable, order kept in pending state");
+		  OrderDto fallbackOrder = new OrderDto(null, orderDto.getUserId(), 
+				  orderDto.getAmount(), "⚠️ User-service Unavailable, order kept in pending state");
 		  
 		  return CompletableFuture.completedFuture(fallbackOrder);
 	  }

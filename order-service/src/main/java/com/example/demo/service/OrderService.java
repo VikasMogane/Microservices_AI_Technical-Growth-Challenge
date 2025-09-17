@@ -15,7 +15,9 @@ import java.util.stream.Collectors;
 	import com.example.demo.dto.OrderDto;
 	import com.example.demo.dto.UserDto;
 	import com.example.demo.entity.Order;
-	import com.example.demo.repository.OrderRepository;
+import com.example.demo.events.OrderEvent;
+import com.example.demo.kafka.OrderProducer;
+import com.example.demo.repository.OrderRepository;
 
 import io.github.resilience4j.bulkhead.BulkheadFullException;
 import io.github.resilience4j.bulkhead.annotation.Bulkhead;
@@ -33,6 +35,10 @@ import io.github.resilience4j.retry.annotation.Retry;
 		
 		  private final OrderRepository orderRepository;
 		  private final RestTemplate restTemplate;
+		  
+		  
+		  @Autowired
+		  private OrderProducer orderProducer;
 		  
 		  
 		  public OrderService(OrderRepository orderRepository)
@@ -71,12 +77,12 @@ import io.github.resilience4j.retry.annotation.Retry;
 				  throw new RuntimeException("User Not Found");
 			  }
 			  
-			  try {
+			/*  try {
 					Thread.sleep(5000);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				}
+				} */
 			  Order order  = new Order();
 			 // order.setOrderId(orderDto.getOrderId());
 			  order.setUserId(orderDto.getUserId());
@@ -84,6 +90,10 @@ import io.github.resilience4j.retry.annotation.Retry;
 			  order.setOrderStatus("Order Created");
 			  
 			  Order saveOrder = orderRepository.save(order);  
+			  
+			  //kafka-producer
+			  OrderEvent orderEvent  = new OrderEvent(saveOrder.getOrderId(), saveOrder.getUserId(), saveOrder.getAmount(), "created");
+			  orderProducer.sendOrderEvent(orderEvent);
 			  
 			  return new OrderDto(saveOrder.getOrderId(), saveOrder.getUserId(), saveOrder.getAmount(), saveOrder.getOrderStatus());
 				    });

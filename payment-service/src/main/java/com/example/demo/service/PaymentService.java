@@ -4,26 +4,44 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.example.demo.dto.OrderDTO;
 import com.example.demo.dto.PaymentDTO;
 import com.example.demo.entity.Payment;
+import com.example.demo.events.OrderEvent;
 import com.example.demo.repository.PaymentRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import lombok.NoArgsConstructor;
 
 @Service
+@NoArgsConstructor
 public class PaymentService {
 	
+ private static final Logger log = LoggerFactory.getLogger(PaymentService.class);
 	
  private final PaymentRepository paymentRepository;
  private final RestTemplate restTemplate;
+ 
+ private final KafkaTemplate<String, OrderEvent> kafkaEvent;
 
-  
- public PaymentService(PaymentRepository paymentRepository)
+//  
+// public PaymentService(PaymentRepository paymentRepository)
+// {
+//	 this.paymentRepository = paymentRepository;
+//	 this.restTemplate = new RestTemplate();
+// }
+
+ public PaymentService(PaymentRepository paymentRepository,KafkaTemplate<String, OrderEvent> kafkaEvent)
  {
 	 this.paymentRepository = paymentRepository;
-	 this.restTemplate = new RestTemplate();
+	 this.restTemplate      = new RestTemplate();
+	 this.kafkaEvent        = kafkaEvent;
  }
  public PaymentDTO makePayment(PaymentDTO paymentDTO) {
      // ✅ Call Order-Service to validate order
@@ -53,6 +71,32 @@ public class PaymentService {
              saved.getPaymentStatus(),
              saved.getTransactionId()
      );
+ }
+ 
+ @KafkaListener(topics = "order-events", groupId = "payment-group")
+ public void consumeOrderEvent(OrderEvent orderEvent)
+ {
+	    log.info(">>> Received OrderEvent in payment-service: {}", orderEvent);
+        log.debug("OrderEvent details - orderId: {}, userId: {}, amount: {}, status: {}",
+                orderEvent.getOrderId(),
+                orderEvent.getUserId(),
+                orderEvent.getAmount(),
+                orderEvent.getStatus());
+	 System.out.println("Receive Order Event "+ orderEvent);
+	 
+	 Payment paymentDto = new Payment();
+	 paymentDto.setOrderId(orderEvent.getOrderId());
+	 paymentDto.setAmount(orderEvent.getAmount());
+	 paymentDto.setPaymentStatus(orderEvent.getStatus());
+	 paymentDto.setTransactionId(UUID.randomUUID().toString());
+	 
+	 Payment savePayment = paymentRepository.save(paymentDto);
+	 
+	 // payment Done for Order Id
+     log.info("Payment saved for OrderId -> {} (paymentId: {})", savePayment.getOrderId(), savePayment.getPaymentId());
+
+	 
+	 
  }
 
  public List<PaymentDTO> getAllPayments() {

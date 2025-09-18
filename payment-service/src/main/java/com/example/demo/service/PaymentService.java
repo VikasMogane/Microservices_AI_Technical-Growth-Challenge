@@ -27,10 +27,11 @@ public class PaymentService {
  private static final Logger log = LoggerFactory.getLogger(PaymentService.class);
 	
  @Autowired
- private final PaymentRepository paymentRepository;
- private final RestTemplate restTemplate;
+ private  PaymentRepository paymentRepository;
+ private  RestTemplate restTemplate;
  
- private final KafkaTemplate<String, OrderEvent> kafkaEvent;
+ @Autowired
+ private  KafkaTemplate<String, OrderEvent> kafkaEvent;
 
 //  
 // public PaymentService(PaymentRepository paymentRepository)

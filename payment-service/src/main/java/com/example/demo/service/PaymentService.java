@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class PaymentService {
 	
  private static final Logger log = LoggerFactory.getLogger(PaymentService.class);
 	
+ @Autowired
  private final PaymentRepository paymentRepository;
  private final RestTemplate restTemplate;
  
